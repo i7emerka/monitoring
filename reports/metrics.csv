@@ -1,0 +1,15 @@
+datetime,geo,page,final_url,real_time,ttfb,dom_content_loaded,load,redirects,requests,failed_requests,http_errors
+2026-06-26 15:58:51.308525,Uzbekistan,HOME,https://fastpari-92371.bar/ru,5074,4192,4396,5069,0,103,0,0
+2026-06-26 15:58:54.235892,Uzbekistan,CASINO,https://fastpari-92371.bar/ru/casino,2860,2125,2810,2855,0,45,0,0
+2026-06-26T17:44:02.045671,Uzbekistan,HOME,https://fastpari-92371.bar/ru,https://fastpari-92371.bar/ru,0,705,907,1002,
+2026-06-26T17:44:04.384147,Uzbekistan,CASINO,https://fastpari-92371.bar/ru/casino,https://fastpari-92371.bar/ru/casino,0,901,973,1048,
+2026-06-26T17:44:44.058955,Bangladesh,HOME,https://fastpari.com/bn,https://fastpari.com/bn,1,1009,2443,4749,
+2026-06-26T17:44:47.454477,Bangladesh,CASINO,https://fastpari.com/bn/casino,https://fastpari.com/bn/casino,1,1195,2112,2344,
+2026-06-26T18:03:23.674519,Uzbekistan,HOME,https://fastpari-92371.bar/uz,https://fastpari-92371.bar/uz,0,1086,1286,1363,
+2026-06-26T18:03:26.394361,Uzbekistan,CASINO,https://fastpari-92371.bar/uz/casino,https://fastpari-92371.bar/uz/casino,0,1218,1306,1356,
+2026-06-26T18:03:45.867455,Bangladesh,HOME,https://fastpari.com/bn,https://fastpari.com/bn,1,1057,1303,1374,
+2026-06-26T18:03:48.329900,Bangladesh,CASINO,https://fastpari.com/bn/casino,https://fastpari.com/bn/casino,1,1387,1452,1536,
+2026-06-26T19:25:52.038519,Uzbekistan,HOME,https://fastpari-92371.bar/uz,https://fastpari-92371.bar/uz,0,776,975,1053,
+2026-06-26T19:25:55.062490,Uzbekistan,CASINO,https://fastpari-92371.bar/uz/casino,https://fastpari-92371.bar/uz/casino,0,1022,1660,1711,
+2026-06-26T19:26:19.789160,Bangladesh,HOME,https://fastpari.com/bn,https://fastpari.com/bn,1,919,1201,1233,
+2026-06-26T19:26:22.106891,Bangladesh,CASINO,https://fastpari.com/bn/casino,https://fastpari.com/bn/casino,1,1227,1300,1390,
