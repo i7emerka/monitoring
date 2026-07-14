@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Fastpari Monitoring — 2026-07-14 19:08:39</title>
+    <title>Fastpari Monitoring — 2026-07-14 19:59:18</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         :root {
             --bg: #f4f6fb;
@@ -284,13 +285,163 @@
         tr.data-row.hidden-row {
             display: none;
         }
+
+        .charts-section {
+            margin-top: 32px;
+        }
+
+        .charts-intro {
+            margin: 0 0 18px;
+        }
+
+        .charts-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px 16px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        .chart-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .chart-title {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .chart-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .period-btns {
+            display: inline-flex;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .period-btn {
+            border: 0;
+            background: transparent;
+            color: var(--muted);
+            padding: 8px 14px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .period-btn.active {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .metric-picker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .metric-select {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-size: 13px;
+            background: #fff;
+            color: var(--text);
+        }
+
+        .chart-canvas-wrap {
+            position: relative;
+            height: 320px;
+        }
+
+        .chart-canvas-wrap canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .chart-empty {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            color: var(--muted);
+            background: #f8fafc;
+            border: 1px dashed var(--border);
+            border-radius: 10px;
+        }
+
+        .chart-empty.hidden {
+            display: none;
+        }
+
+        .chart-meta {
+            margin: 10px 0 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .chart-subsection {
+            margin-top: 20px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .chart-subtitle {
+            margin: 0 0 12px;
+            font-size: 15px;
+            color: var(--text);
+        }
+
+        .chart-duo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .chart-duo-label {
+            margin: 0 0 8px;
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .chart-canvas-wrap--short {
+            height: 260px;
+        }
+
+        .chart-compare-meta {
+            margin: 12px 0 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <section class="hero">
             <h1>Fastpari Performance Report</h1>
-            <p class="subtitle">Сгенерировано: 2026-07-14 19:08:39</p>
+            <p class="subtitle">Сгенерировано: 2026-07-14 19:59:18</p>
         </section>
 
         <section class="legend">
@@ -324,19 +475,162 @@
     <div class="table-wrap">
         <table class="metrics-table">
             <thead><tr><th><span class="th-label" data-tooltip="Номер записи. Для удаления: python delete_metrics.py --ids N">#</span></th><th><span class="th-label" data-tooltip="Момент, когда метрики были записаны в CSV.">Дата и время</span></th><th><span class="th-label" data-tooltip="География профиля браузера (страна прокси / Dolphin Anty).">Гео</span></th><th><span class="th-label" data-tooltip="Тестируемая страница: HOME — главная.">Страница</span></th><th><span class="th-label" data-tooltip="local_ip — ваш IP; local_proxy — Playwright на ПК через прокси; dolphin_proxy — Dolphin Anty.">Источник</span></th><th><span class="th-label" data-tooltip="Адрес страницы после всех редиректов.">Финальный URL</span></th><th><span class="th-label" data-tooltip="Time To First Byte — время до первого байта ответа сервера (мс). Показывает скорость реакции бэкенда и сети.">TTFB</span></th><th><span class="th-label" data-tooltip="First Contentful Paint — когда пользователь впервые видит контент: текст, изображение или canvas (мс).">FCP</span></th><th><span class="th-label" data-tooltip="Largest Contentful Paint — когда отрисовывается самый крупный видимый элемент страницы (мс). Ключевая метрика воспринимаемой скорости.">LCP</span></th><th><span class="th-label" data-tooltip="DOM Content Loaded — HTML полностью разобран, DOM готов. Скрипты могут ещё догружаться (мс).">DCL</span></th><th><span class="th-label" data-tooltip="Полная загрузка страницы — событие load, когда загружены все ресурсы на странице (мс).">Load</span></th><th><span class="th-label" data-tooltip="Cumulative Layout Shift — насколько сильно «прыгает» вёрстка при загрузке. 0 — идеально, чем меньше — тем лучше.">CLS</span></th><th><span class="th-label" data-tooltip="Общее количество сетевых запросов при загрузке страницы. Меньше — обычно лучше.">Запросы</span></th><th><span class="th-label" data-tooltip="Суммарный объём переданных данных по всем запросам (КБ). Влияет на скорость на медленных сетях.">Трафик</span></th><th><span class="th-label" data-tooltip="Число переадресаций до финального URL: HTTP-редиректы + клиентские (JS), если итоговый адрес отличается от стартового.">Редиректы</span></th><th><span class="th-label" data-tooltip="Текст ошибки, если страница не загрузилась. Пустое значение — успех.">Ошибка</span></th></tr></thead>
-            <tbody id="metrics-body"><tr class="data-row"><td class="metric neutral">1</td><td class="metric neutral">2026-07-14 17:30:30</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">696</td><td class="metric good">920</td><td class="metric good">920</td><td class="metric good">855</td><td class="metric good">856</td><td class="metric good">0.001</td><td class="metric bad">110</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">2</td><td class="metric neutral">2026-07-14 17:30:12</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">291</td><td class="metric good">680</td><td class="metric good">892</td><td class="metric good">665</td><td class="metric good">1392</td><td class="metric good">0.002</td><td class="metric bad">221</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">3</td><td class="metric neutral">2026-07-14 17:29:19</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">225</td><td class="metric good">388</td><td class="metric good">388</td><td class="metric good">369</td><td class="metric good">370</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">4</td><td class="metric neutral">2026-07-14 17:29:11</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1311</td><td class="metric good">1532</td><td class="metric good">1532</td><td class="metric good">1524</td><td class="metric good">1524</td><td class="metric good">0.000</td><td class="metric bad">108</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">5</td><td class="metric neutral">2026-07-14 17:28:52</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1423</td><td class="metric warn">2820</td><td class="metric warn">3940</td><td class="metric warn">2807</td><td class="metric warn">3940</td><td class="metric good">0.001</td><td class="metric warn">96</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">6</td><td class="metric neutral">2026-07-14 17:28:16</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric good">692</td><td class="metric good">952</td><td class="metric good">952</td><td class="metric good">890</td><td class="metric warn">3617</td><td class="metric good">0.002</td><td class="metric warn">99</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">7</td><td class="metric neutral">2026-07-14 17:27:59</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric good">711</td><td class="metric good">1788</td><td class="metric warn">2528</td><td class="metric good">1769</td><td class="metric warn">4572</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">8</td><td class="metric neutral">2026-07-14 17:23:41</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">702</td><td class="metric good">948</td><td class="metric good">948</td><td class="metric good">876</td><td class="metric good">877</td><td class="metric good">0.001</td><td class="metric bad">110</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">9</td><td class="metric neutral">2026-07-14 17:23:26</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">328</td><td class="metric good">744</td><td class="metric good">944</td><td class="metric good">730</td><td class="metric good">1524</td><td class="metric good">0.002</td><td class="metric bad">216</td><td class="metric good">26 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">10</td><td class="metric neutral">2026-07-14 17:23:18</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">159</td><td class="metric good">272</td><td class="metric good">272</td><td class="metric good">330</td><td class="metric good">504</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">11</td><td class="metric neutral">2026-07-14 17:23:10</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1093</td><td class="metric good">1312</td><td class="metric good">1312</td><td class="metric good">1296</td><td class="metric good">1296</td><td class="metric good">0.000</td><td class="metric bad">103</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">12</td><td class="metric neutral">2026-07-14 17:22:52</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1103</td><td class="metric warn">2980</td><td class="metric bad">4164</td><td class="metric warn">2961</td><td class="metric warn">4164</td><td class="metric good">0.001</td><td class="metric warn">96</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">13</td><td class="metric neutral">2026-07-14 17:22:35</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric good">709</td><td class="metric good">948</td><td class="metric good">948</td><td class="metric good">868</td><td class="metric good">948</td><td class="metric good">0.000</td><td class="metric warn">95</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">14</td><td class="metric neutral">2026-07-14 17:22:17</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">827</td><td class="metric warn">2008</td><td class="metric warn">2852</td><td class="metric good">1990</td><td class="metric warn">4358</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">15</td><td class="metric neutral">2026-07-14 16:03:01</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">587</td><td class="metric good">796</td><td class="metric good">796</td><td class="metric good">730</td><td class="metric good">730</td><td class="metric good">0.001</td><td class="metric warn">100</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">16</td><td class="metric neutral">2026-07-14 16:02:47</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">401</td><td class="metric warn">2924</td><td class="metric warn">2924</td><td class="metric warn">2896</td><td class="metric warn">3706</td><td class="metric good">0.001</td><td class="metric bad">107</td><td class="metric good">26 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">17</td><td class="metric neutral">2026-07-14 16:02:38</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">154</td><td class="metric good">572</td><td class="metric good">572</td><td class="metric good">313</td><td class="metric good">640</td><td class="metric good">0.002</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">18</td><td class="metric neutral">2026-07-14 16:02:32</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">940</td><td class="metric good">1212</td><td class="metric good">1212</td><td class="metric good">1150</td><td class="metric good">1151</td><td class="metric good">0.000</td><td class="metric bad">101</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">19</td><td class="metric neutral">2026-07-14 16:02:16</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">948</td><td class="metric warn">2288</td><td class="metric warn">3140</td><td class="metric warn">2270</td><td class="metric warn">3140</td><td class="metric good">0.001</td><td class="metric warn">96</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">20</td><td class="metric neutral">2026-07-14 16:02:02</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric good">703</td><td class="metric good">924</td><td class="metric good">924</td><td class="metric good">858</td><td class="metric good">924</td><td class="metric good">0.002</td><td class="metric warn">97</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">21</td><td class="metric neutral">2026-07-14 16:01:46</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">838</td><td class="metric warn">1808</td><td class="metric warn">2824</td><td class="metric good">1794</td><td class="metric good">2824</td><td class="metric good">0.003</td><td class="metric warn">95</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">22</td><td class="metric neutral">2026-07-14 15:58:48</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">715</td><td class="metric good">956</td><td class="metric good">1928</td><td class="metric good">922</td><td class="metric good">1911</td><td class="metric good">0.001</td><td class="metric bad">101</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">23</td><td class="metric neutral">2026-07-14 15:58:34</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">286</td><td class="metric good">748</td><td class="metric good">1100</td><td class="metric good">734</td><td class="metric good">1537</td><td class="metric good">0.001</td><td class="metric bad">107</td><td class="metric good">26 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">24</td><td class="metric neutral">2026-07-14 15:58:27</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">416</td><td class="metric good">812</td><td class="metric good">812</td><td class="metric good">567</td><td class="metric good">568</td><td class="metric good">0.002</td><td class="metric bad">221</td><td class="metric good">2 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">25</td><td class="metric neutral">2026-07-14 15:58:17</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1205</td><td class="metric good">1440</td><td class="metric good">1440</td><td class="metric good">1473</td><td class="metric good">1473</td><td class="metric good">0.000</td><td class="metric warn">99</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">26</td><td class="metric neutral">2026-07-14 15:58:00</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">941</td><td class="metric warn">2088</td><td class="metric warn">2844</td><td class="metric warn">2074</td><td class="metric good">2844</td><td class="metric good">0.001</td><td class="metric warn">97</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">27</td><td class="metric neutral">2026-07-14 15:57:46</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">874</td><td class="metric good">1152</td><td class="metric good">1152</td><td class="metric good">1086</td><td class="metric good">1152</td><td class="metric good">0.002</td><td class="metric warn">96</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">28</td><td class="metric neutral">2026-07-14 15:57:29</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric good">731</td><td class="metric warn">1852</td><td class="metric warn">2836</td><td class="metric good">1839</td><td class="metric good">2836</td><td class="metric good">0.004</td><td class="metric warn">96</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">29</td><td class="metric neutral">2026-07-14 15:50:32</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">793</td><td class="metric good">940</td><td class="metric warn">3960</td><td class="metric good">989</td><td class="metric bad">-1</td><td class="metric good">0.002</td><td class="metric warn">95</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">30</td><td class="metric neutral">2026-07-14 15:50:15</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">371</td><td class="metric warn">2160</td><td class="metric good">2160</td><td class="metric warn">2141</td><td class="metric warn">3021</td><td class="metric good">0.001</td><td class="metric bad">115</td><td class="metric good">27 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">31</td><td class="metric neutral">2026-07-14 15:50:02</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">348</td><td class="metric good">784</td><td class="metric good">784</td><td class="metric good">526</td><td class="metric good">527</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">32</td><td class="metric neutral">2026-07-14 15:49:50</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1326</td><td class="metric warn">2432</td><td class="metric good">2432</td><td class="metric good">1513</td><td class="metric good">1514</td><td class="metric good">0.000</td><td class="metric warn">100</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">33</td><td class="metric neutral">2026-07-14 15:49:30</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/en</td><td class="metric warn">927</td><td class="metric bad">3580</td><td class="metric bad">4532</td><td class="metric warn">2665</td><td class="metric bad">5116</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">34</td><td class="metric neutral">2026-07-14 15:49:08</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1113</td><td class="metric bad">5028</td><td class="metric bad">5028</td><td class="metric good">1325</td><td class="metric good">1326</td><td class="metric good">0.002</td><td class="metric warn">100</td><td class="metric good">24 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">35</td><td class="metric neutral">2026-07-14 15:48:39</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-92371.bar/en</td><td class="metric warn">853</td><td class="metric bad">3388</td><td class="metric bad">4184</td><td class="metric warn">2089</td><td class="metric bad">-1283</td><td class="metric good">0.003</td><td class="metric warn">98</td><td class="metric good">1 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">36</td><td class="metric neutral">2026-07-14 15:36:49</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">746</td><td class="metric good">976</td><td class="metric good">976</td><td class="metric good">911</td><td class="metric good">912</td><td class="metric good">0.001</td><td class="metric bad">111</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">37</td><td class="metric neutral">2026-07-14 15:36:34</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">645</td><td class="metric good">1544</td><td class="metric good">2140</td><td class="metric good">1529</td><td class="metric warn">3496</td><td class="metric good">0.002</td><td class="metric warn">100</td><td class="metric good">25 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">38</td><td class="metric neutral">2026-07-14 15:36:18</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">345</td><td class="metric good">820</td><td class="metric good">820</td><td class="metric good">524</td><td class="metric good">525</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">39</td><td class="metric neutral">2026-07-14 15:36:07</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1303</td><td class="metric warn">2392</td><td class="metric good">2392</td><td class="metric good">1449</td><td class="metric good">1453</td><td class="metric good">0.000</td><td class="metric warn">100</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">40</td><td class="metric neutral">2026-07-14 15:35:48</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/en</td><td class="metric warn">1355</td><td class="metric bad">3556</td><td class="metric bad">4524</td><td class="metric warn">2676</td><td class="metric bad">-864</td><td class="metric good">0.003</td><td class="metric warn">97</td><td class="metric good">1 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">41</td><td class="metric neutral">2026-07-14 15:35:23</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1002</td><td class="metric bad">4820</td><td class="metric bad">4820</td><td class="metric good">1159</td><td class="metric good">1159</td><td class="metric good">0.002</td><td class="metric warn">100</td><td class="metric good">24 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">42</td><td class="metric neutral">2026-07-14 15:34:55</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-92371.bar/en</td><td class="metric warn">1083</td><td class="metric bad">3556</td><td class="metric bad">4428</td><td class="metric warn">2129</td><td class="metric warn">4260</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">43</td><td class="metric neutral">2026-07-14 15:31:30</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">621</td><td class="metric good">840</td><td class="metric good">840</td><td class="metric good">767</td><td class="metric good">768</td><td class="metric good">0.001</td><td class="metric bad">167</td><td class="metric good">6 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">44</td><td class="metric neutral">2026-07-14 15:31:15</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">622</td><td class="metric good">1524</td><td class="metric good">2256</td><td class="metric good">1511</td><td class="metric warn">3191</td><td class="metric good">0.003</td><td class="metric bad">101</td><td class="metric good">26 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">45</td><td class="metric neutral">2026-07-14 15:30:59</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">516</td><td class="metric good">956</td><td class="metric good">956</td><td class="metric good">688</td><td class="metric good">860</td><td class="metric good">0.005</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">46</td><td class="metric neutral">2026-07-14 15:30:47</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1323</td><td class="metric warn">2572</td><td class="metric warn">2572</td><td class="metric good">1495</td><td class="metric good">1496</td><td class="metric good">0.000</td><td class="metric bad">112</td><td class="metric good">1 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">47</td><td class="metric neutral">2026-07-14 15:30:27</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/en</td><td class="metric warn">1351</td><td class="metric bad">3780</td><td class="metric bad">4704</td><td class="metric warn">2730</td><td class="metric bad">5448</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">32 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">48</td><td class="metric neutral">2026-07-14 15:30:03</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1068</td><td class="metric bad">4820</td><td class="metric bad">4820</td><td class="metric good">1200</td><td class="metric good">1203</td><td class="metric good">0.002</td><td class="metric warn">96</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">49</td><td class="metric neutral">2026-07-14 15:29:35</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-92371.bar/en</td><td class="metric warn">977</td><td class="metric bad">3256</td><td class="metric bad">4052</td><td class="metric good">1943</td><td class="metric warn">3836</td><td class="metric good">0.003</td><td class="metric warn">100</td><td class="metric good">25 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">50</td><td class="metric neutral">2026-07-14 15:18:52</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">785</td><td class="metric good">1096</td><td class="metric good">1096</td><td class="metric good">1008</td><td class="metric good">1010</td><td class="metric good">0.001</td><td class="metric bad">112</td><td class="metric good">2 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">51</td><td class="metric neutral">2026-07-14 15:18:37</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric warn">821</td><td class="metric good">1776</td><td class="metric warn">2588</td><td class="metric good">1760</td><td class="metric warn">3673</td><td class="metric good">0.003</td><td class="metric warn">100</td><td class="metric good">25 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">52</td><td class="metric neutral">2026-07-14 15:18:24</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">145</td><td class="metric good">528</td><td class="metric good">528</td><td class="metric good">276</td><td class="metric good">285</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">53</td><td class="metric neutral">2026-07-14 15:18:13</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1333</td><td class="metric warn">2480</td><td class="metric good">2480</td><td class="metric good">1530</td><td class="metric good">1531</td><td class="metric good">0.000</td><td class="metric bad">111</td><td class="metric good">1 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">54</td><td class="metric neutral">2026-07-14 15:17:53</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/en</td><td class="metric warn">1353</td><td class="metric bad">4000</td><td class="metric bad">5460</td><td class="metric warn">2761</td><td class="metric bad">-1221</td><td class="metric good">0.003</td><td class="metric warn">97</td><td class="metric good">1 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">55</td><td class="metric neutral">2026-07-14 15:17:35</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">903</td><td class="metric bad">5328</td><td class="metric bad">5328</td><td class="metric good">1105</td><td class="metric good">1106</td><td class="metric good">0.002</td><td class="metric bad">105</td><td class="metric good">25 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">56</td><td class="metric neutral">2026-07-14 15:17:06</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-92371.bar/en</td><td class="metric warn">914</td><td class="metric bad">3124</td><td class="metric warn">3844</td><td class="metric good">1870</td><td class="metric warn">4270</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">57</td><td class="metric neutral">2026-07-14 15:13:14</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">763</td><td class="metric good">1024</td><td class="metric good">1024</td><td class="metric good">947</td><td class="metric good">949</td><td class="metric good">0.001</td><td class="metric bad">111</td><td class="metric good">2 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">58</td><td class="metric neutral">2026-07-14 15:12:49</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">754</td><td class="metric good">1720</td><td class="metric good">2380</td><td class="metric good">1690</td><td class="metric warn">3589</td><td class="metric good">0.002</td><td class="metric warn">100</td><td class="metric good">25 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">59</td><td class="metric neutral">2026-07-14 15:12:31</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">177</td><td class="metric good">580</td><td class="metric good">580</td><td class="metric good">304</td><td class="metric good">305</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">60</td><td class="metric neutral">2026-07-14 15:12:12</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/en</td><td class="metric warn">1205</td><td class="metric bad">3228</td><td class="metric warn">3992</td><td class="metric warn">2334</td><td class="metric bad">5096</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">61</td><td class="metric neutral">2026-07-14 15:11:43</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-92371.bar/en</td><td class="metric warn">1058</td><td class="metric bad">3480</td><td class="metric bad">4516</td><td class="metric warn">2194</td><td class="metric bad">5079</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">62</td><td class="metric neutral">2026-07-14 15:08:46</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">620</td><td class="metric good">864</td><td class="metric good">864</td><td class="metric good">789</td><td class="metric good">790</td><td class="metric good">0.001</td><td class="metric bad">113</td><td class="metric good">6 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">63</td><td class="metric neutral">2026-07-14 15:08:22</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">768</td><td class="metric good">1676</td><td class="metric good">2368</td><td class="metric good">1661</td><td class="metric warn">3265</td><td class="metric good">0.003</td><td class="metric bad">101</td><td class="metric good">26 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">64</td><td class="metric neutral">2026-07-14 15:08:01</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">152</td><td class="metric good">536</td><td class="metric good">536</td><td class="metric good">279</td><td class="metric good">280</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">65</td><td class="metric neutral">2026-07-14 15:07:39</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/en</td><td class="metric warn">1318</td><td class="metric bad">3280</td><td class="metric bad">4032</td><td class="metric warn">2386</td><td class="metric warn">4698</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">66</td><td class="metric neutral">2026-07-14 15:00:58</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">785</td><td class="metric good">984</td><td class="metric good">984</td><td class="metric good">913</td><td class="metric good">917</td><td class="metric good">0.001</td><td class="metric bad">113</td><td class="metric good">6 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">67</td><td class="metric neutral">2026-07-14 15:00:32</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric warn">1059</td><td class="metric warn">2168</td><td class="metric warn">2960</td><td class="metric warn">2150</td><td class="metric warn">4549</td><td class="metric good">0.002</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">68</td><td class="metric neutral">2026-07-14 15:00:12</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">147</td><td class="metric good">532</td><td class="metric good">532</td><td class="metric good">271</td><td class="metric good">272</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">69</td><td class="metric neutral">2026-07-14 14:59:52</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/en</td><td class="metric warn">1171</td><td class="metric bad">3124</td><td class="metric bad">4276</td><td class="metric warn">2243</td><td class="metric warn">4712</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">70</td><td class="metric neutral">2026-07-14 14:59:23</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-92371.bar/en</td><td class="metric warn">1094</td><td class="metric bad">3692</td><td class="metric bad">4568</td><td class="metric warn">2329</td><td class="metric bad">5046</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">71</td><td class="metric neutral">2026-07-14 14:51:39</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">771</td><td class="metric good">1044</td><td class="metric good">1044</td><td class="metric good">978</td><td class="metric good">979</td><td class="metric good">0.001</td><td class="metric bad">112</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">72</td><td class="metric neutral">2026-07-14 14:51:14</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">707</td><td class="metric good">1724</td><td class="metric good">2412</td><td class="metric good">1707</td><td class="metric warn">3678</td><td class="metric good">0.002</td><td class="metric warn">100</td><td class="metric good">25 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">73</td><td class="metric neutral">2026-07-14 14:50:54</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">150</td><td class="metric good">532</td><td class="metric good">532</td><td class="metric good">279</td><td class="metric good">279</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">74</td><td class="metric neutral">2026-07-14 14:50:36</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1117</td><td class="metric warn">2140</td><td class="metric good">2140</td><td class="metric good">1289</td><td class="metric good">1290</td><td class="metric good">0.000</td><td class="metric bad">111</td><td class="metric good">1 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">75</td><td class="metric neutral">2026-07-14 14:50:06</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1073</td><td class="metric bad">5844</td><td class="metric bad">5844</td><td class="metric good">1200</td><td class="metric good">1205</td><td class="metric good">0.002</td><td class="metric warn">100</td><td class="metric good">24 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">76</td><td class="metric neutral">2026-07-14 14:43:26</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">636</td><td class="metric good">832</td><td class="metric good">832</td><td class="metric good">779</td><td class="metric good">780</td><td class="metric good">0.001</td><td class="metric bad">110</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">77</td><td class="metric neutral">2026-07-14 14:42:49</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">145</td><td class="metric good">528</td><td class="metric good">528</td><td class="metric good">318</td><td class="metric good">318</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">78</td><td class="metric neutral">2026-07-14 14:42:30</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1051</td><td class="metric warn">2152</td><td class="metric good">2152</td><td class="metric good">1281</td><td class="metric good">1282</td><td class="metric good">0.000</td><td class="metric bad">112</td><td class="metric good">1 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">79</td><td class="metric neutral">2026-07-14 14:42:00</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric good">744</td><td class="metric bad">4492</td><td class="metric bad">4492</td><td class="metric good">895</td><td class="metric good">896</td><td class="metric good">0.002</td><td class="metric warn">100</td><td class="metric good">24 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">80</td><td class="metric neutral">2026-07-14 14:40:00</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">764</td><td class="metric good">952</td><td class="metric good">952</td><td class="metric good">977</td><td class="metric good">977</td><td class="metric good">0.001</td><td class="metric bad">113</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">81</td><td class="metric neutral">2026-07-14 14:28:43</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">344</td><td class="metric good">788</td><td class="metric good">788</td><td class="metric good">501</td><td class="metric good">502</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">82</td><td class="metric neutral">2026-07-14 14:27:21</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1257</td><td class="metric bad">3336</td><td class="metric warn">3336</td><td class="metric good">1457</td><td class="metric good">1463</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">83</td><td class="metric neutral">2026-07-14 14:25:43</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1105</td><td class="metric bad">3912</td><td class="metric warn">3912</td><td class="metric good">1815</td><td class="metric good">1816</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">84</td><td class="metric neutral">2026-07-13 19:57:17</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric warn">1342</td><td class="metric good">1536</td><td class="metric good">1536</td><td class="metric good">1568</td><td class="metric good">1568</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">85</td><td class="metric neutral">2026-07-13 19:54:28</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">321</td><td class="metric good">692</td><td class="metric good">692</td><td class="metric good">442</td><td class="metric good">443</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">86</td><td class="metric neutral">2026-07-13 19:52:51</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric warn">1403</td><td class="metric good">1624</td><td class="metric good">1624</td><td class="metric good">1614</td><td class="metric good">1615</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">87</td><td class="metric neutral">2026-07-13 19:50:31</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">338</td><td class="metric good">716</td><td class="metric good">716</td><td class="metric good">471</td><td class="metric good">472</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">88</td><td class="metric neutral">2026-07-13 19:44:00</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">347</td><td class="metric good">696</td><td class="metric good">696</td><td class="metric good">517</td><td class="metric good">518</td><td class="metric good">0.005</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">89</td><td class="metric neutral">2026-07-13 19:33:55</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric warn">1330</td><td class="metric good">1492</td><td class="metric good">1492</td><td class="metric good">1475</td><td class="metric good">1479</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">90</td><td class="metric neutral">2026-07-13 19:29:53</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1309</td><td class="metric warn">2676</td><td class="metric warn">2676</td><td class="metric good">1514</td><td class="metric bad">6553</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">91</td><td class="metric neutral">2026-07-13 19:28:14</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1130</td><td class="metric bad">4720</td><td class="metric bad">4720</td><td class="metric good">1322</td><td class="metric good">1323</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">92</td><td class="metric neutral">2026-07-13 19:08:51</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric warn">1183</td><td class="metric bad">5064</td><td class="metric bad">5064</td><td class="metric good">1340</td><td class="metric good">1342</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">93</td><td class="metric neutral">2026-07-13 19:07:13</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1110</td><td class="metric warn">2144</td><td class="metric good">2144</td><td class="metric good">1379</td><td class="metric good">1380</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">94</td><td class="metric neutral">2026-07-13 19:05:25</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1350</td><td class="metric bad">5296</td><td class="metric bad">5296</td><td class="metric good">1506</td><td class="metric good">1508</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">95</td><td class="metric neutral">2026-07-13 18:51:08</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric warn">885</td><td class="metric bad">0</td><td class="metric good">2232</td><td class="metric good">1043</td><td class="metric good">1045</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">96</td><td class="metric neutral">2026-07-13 18:31:13</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1555</td><td class="metric warn">2816</td><td class="metric warn">2816</td><td class="metric good">1759</td><td class="metric bad">6852</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">97</td><td class="metric neutral">2026-07-13 18:29:45</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1191</td><td class="metric warn">2880</td><td class="metric warn">2880</td><td class="metric good">1362</td><td class="metric good">2404</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">98</td><td class="metric neutral">2026-07-13 18:14:27</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1407</td><td class="metric warn">2488</td><td class="metric good">2488</td><td class="metric good">1592</td><td class="metric bad">5007</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">99</td><td class="metric neutral">2026-07-13 18:13:09</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1342</td><td class="metric bad">5748</td><td class="metric bad">5748</td><td class="metric good">1538</td><td class="metric good">1538</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">100</td><td class="metric neutral">2026-07-13 17:30:54</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1593</td><td class="metric warn">2812</td><td class="metric warn">2812</td><td class="metric good">1854</td><td class="metric bad">9777</td><td class="metric good">0.002</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">101</td><td class="metric neutral">2026-07-13 17:29:15</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1152</td><td class="metric bad">5140</td><td class="metric bad">5140</td><td class="metric good">1305</td><td class="metric good">1310</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">102</td><td class="metric neutral">2026-07-13 17:23:22</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1343</td><td class="metric warn">2628</td><td class="metric warn">2628</td><td class="metric good">1526</td><td class="metric good">2528</td><td class="metric good">0.002</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">103</td><td class="metric neutral">2026-07-13 17:21:55</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">934</td><td class="metric bad">4912</td><td class="metric bad">4912</td><td class="metric good">1123</td><td class="metric good">1130</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">104</td><td class="metric neutral">2026-07-13 16:31:00</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">349</td><td class="metric good">728</td><td class="metric good">728</td><td class="metric good">488</td><td class="metric good">489</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">105</td><td class="metric neutral">2026-07-09 19:39:54</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1461</td><td class="metric warn">2640</td><td class="metric warn">2640</td><td class="metric good">1692</td><td class="metric good">1692</td><td class="metric good">0.002</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">106</td><td class="metric neutral">2026-07-09 19:38:37</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1121</td><td class="metric bad">4632</td><td class="metric bad">4632</td><td class="metric good">1308</td><td class="metric good">1903</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">107</td><td class="metric neutral">2026-07-09 19:29:55</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1166</td><td class="metric warn">2264</td><td class="metric good">2264</td><td class="metric good">1421</td><td class="metric good">1422</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">108</td><td class="metric neutral">2026-07-09 19:28:42</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1038</td><td class="metric bad">4428</td><td class="metric bad">4428</td><td class="metric good">1276</td><td class="metric good">1277</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">109</td><td class="metric neutral">2026-07-09 19:01:12</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1310</td><td class="metric warn">2356</td><td class="metric good">2356</td><td class="metric good">1531</td><td class="metric good">1531</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">110</td><td class="metric neutral">2026-07-09 18:59:02</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1092</td><td class="metric bad">5004</td><td class="metric bad">5004</td><td class="metric good">1300</td><td class="metric good">1300</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">111</td><td class="metric neutral">2026-07-09 18:53:51</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric bad">1801</td><td class="metric warn">2876</td><td class="metric warn">2876</td><td class="metric warn">2027</td><td class="metric warn">4360</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">112</td><td class="metric neutral">2026-07-09 18:52:15</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1081</td><td class="metric warn">2572</td><td class="metric warn">2572</td><td class="metric good">1296</td><td class="metric good">1297</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">113</td><td class="metric neutral">2026-07-09 15:49:36</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1528</td><td class="metric warn">2784</td><td class="metric warn">2784</td><td class="metric good">1748</td><td class="metric bad">8412</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">114</td><td class="metric neutral">2026-07-09 15:48:12</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1282</td><td class="metric bad">4988</td><td class="metric bad">4988</td><td class="metric good">1485</td><td class="metric good">1485</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">115</td><td class="metric neutral">2026-07-08 16:17:50</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1159</td><td class="metric warn">2388</td><td class="metric good">2388</td><td class="metric good">1376</td><td class="metric bad">6205</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">116</td><td class="metric neutral">2026-07-08 16:16:26</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1178</td><td class="metric bad">6092</td><td class="metric bad">6092</td><td class="metric good">1861</td><td class="metric good">1868</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">117</td><td class="metric neutral">2026-07-08 16:07:01</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1336</td><td class="metric warn">2560</td><td class="metric warn">2560</td><td class="metric good">1648</td><td class="metric bad">6904</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">118</td><td class="metric neutral">2026-07-08 16:05:26</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1200</td><td class="metric bad">4860</td><td class="metric bad">4860</td><td class="metric good">1357</td><td class="metric good">1360</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">119</td><td class="metric neutral">2026-07-08 15:50:30</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1631</td><td class="metric warn">2732</td><td class="metric warn">2732</td><td class="metric good">1834</td><td class="metric bad">7741</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">120</td><td class="metric neutral">2026-07-08 15:48:54</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">—</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">1322</td><td class="metric bad">5116</td><td class="metric bad">5116</td><td class="metric good">1520</td><td class="metric good">1521</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr></tbody>
-            <tfoot><tr class="summary-divider"><td colspan="16">По гео и источнику</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric warn">1190</td><td class="metric bad">3157</td><td class="metric bad">4146</td><td class="metric warn">2537</td><td class="metric warn">4351</td><td class="metric good">0.002</td><td class="metric warn">98</td><td class="metric good">4 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric warn">1205</td><td class="metric bad">3228</td><td class="metric bad">4164</td><td class="metric warn">2665</td><td class="metric warn">4698</td><td class="metric good">0.003</td><td class="metric warn">97</td><td class="metric good">1 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric warn">1205</td><td class="metric warn">2091</td><td class="metric good">2091</td><td class="metric good">1405</td><td class="metric good">1407</td><td class="metric good">0.000</td><td class="metric bad">119</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric warn">1257</td><td class="metric warn">2152</td><td class="metric good">2152</td><td class="metric good">1457</td><td class="metric good">1463</td><td class="metric good">0.000</td><td class="metric bad">108</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">—</td><td class="metric good">265</td><td class="metric good">637</td><td class="metric good">637</td><td class="metric good">415</td><td class="metric good">453</td><td class="metric good">0.004</td><td class="metric bad">248</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">—</td><td class="metric good">273</td><td class="metric good">636</td><td class="metric good">636</td><td class="metric good">406</td><td class="metric good">480</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric good">588</td><td class="metric good">1616</td><td class="metric good">2094</td><td class="metric good">1598</td><td class="metric warn">3052</td><td class="metric good">0.002</td><td class="metric bad">122</td><td class="metric good">22 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric good">634</td><td class="metric good">1698</td><td class="metric good">2312</td><td class="metric good">1676</td><td class="metric warn">3380</td><td class="metric good">0.002</td><td class="metric bad">101</td><td class="metric good">26 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric warn">801</td><td class="metric good">1021</td><td class="metric good">1327</td><td class="metric good">980</td><td class="metric good">1043</td><td class="metric good">0.002</td><td class="metric bad">137</td><td class="metric good">2 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric good">763</td><td class="metric good">954</td><td class="metric good">984</td><td class="metric good">922</td><td class="metric good">933</td><td class="metric good">0.001</td><td class="metric bad">112</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric warn">909</td><td class="metric warn">2795</td><td class="metric warn">3663</td><td class="metric good">1995</td><td class="metric warn">4120</td><td class="metric good">0.003</td><td class="metric warn">98</td><td class="metric good">3 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric warn">884</td><td class="metric bad">3190</td><td class="metric warn">3948</td><td class="metric good">1966</td><td class="metric warn">4270</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric warn">908</td><td class="metric bad">3475</td><td class="metric warn">3475</td><td class="metric good">1127</td><td class="metric good">1396</td><td class="metric good">0.002</td><td class="metric bad">113</td><td class="metric good">11 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric warn">903</td><td class="metric bad">4492</td><td class="metric bad">4492</td><td class="metric good">1105</td><td class="metric good">1159</td><td class="metric good">0.002</td><td class="metric warn">100</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="summary-divider"><td colspan="16">По гео (все источники)</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric warn">1280</td><td class="metric warn">2608</td><td class="metric warn">2910</td><td class="metric good">1841</td><td class="metric warn">3676</td><td class="metric good">0.002</td><td class="metric bad">163</td><td class="metric good">1 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric warn">1310</td><td class="metric warn">2600</td><td class="metric warn">2658</td><td class="metric good">1620</td><td class="metric good">2992</td><td class="metric good">0.003</td><td class="metric bad">111</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric good">571</td><td class="metric good">1120</td><td class="metric good">1341</td><td class="metric good">941</td><td class="metric good">1339</td><td class="metric good">0.002</td><td class="metric bad">179</td><td class="metric good">6 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric good">620</td><td class="metric good">892</td><td class="metric good">948</td><td class="metric good">789</td><td class="metric good">894</td><td class="metric good">0.002</td><td class="metric bad">216</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric warn">1014</td><td class="metric bad">3787</td><td class="metric bad">4035</td><td class="metric good">1483</td><td class="metric good">2166</td><td class="metric good">0.003</td><td class="metric bad">163</td><td class="metric good">4 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric warn">1068</td><td class="metric bad">4428</td><td class="metric bad">4516</td><td class="metric good">1357</td><td class="metric good">1496</td><td class="metric good">0.003</td><td class="metric warn">100</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="summary-divider"><td colspan="16">По источнику (все гео)</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">—</td><td class="metric good">265</td><td class="metric good">637</td><td class="metric good">637</td><td class="metric good">415</td><td class="metric good">453</td><td class="metric good">0.004</td><td class="metric bad">248</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">—</td><td class="metric good">273</td><td class="metric good">636</td><td class="metric good">636</td><td class="metric good">406</td><td class="metric good">480</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric warn">886</td><td class="metric warn">2487</td><td class="metric warn">3253</td><td class="metric warn">2031</td><td class="metric warn">3762</td><td class="metric good">0.002</td><td class="metric bad">107</td><td class="metric good">10 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric warn">914</td><td class="metric warn">2288</td><td class="metric warn">2960</td><td class="metric warn">2089</td><td class="metric warn">3771</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric warn">945</td><td class="metric warn">2041</td><td class="metric good">2148</td><td class="metric good">1142</td><td class="metric good">1250</td><td class="metric good">0.001</td><td class="metric bad">125</td><td class="metric good">4 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric warn">885</td><td class="metric good">1262</td><td class="metric good">1532</td><td class="metric good">1086</td><td class="metric good">1156</td><td class="metric good">0.001</td><td class="metric bad">110</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-divider"><td colspan="16">Итого</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric warn">913</td><td class="metric warn">2354</td><td class="metric warn">2598</td><td class="metric good">1369</td><td class="metric good">2267</td><td class="metric good">0.002</td><td class="metric bad">170</td><td class="metric good">4 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric warn">944</td><td class="metric warn">2152</td><td class="metric good">2456</td><td class="metric good">1369</td><td class="metric good">1476</td><td class="metric good">0.003</td><td class="metric bad">112</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr></tfoot>
+            <tbody id="metrics-body"><tr class="data-row"><td class="metric neutral">1</td><td class="metric neutral">2026-07-14 17:30:30</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">696</td><td class="metric good">920</td><td class="metric good">920</td><td class="metric good">855</td><td class="metric good">856</td><td class="metric good">0.001</td><td class="metric bad">110</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">2</td><td class="metric neutral">2026-07-14 17:30:12</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">291</td><td class="metric good">680</td><td class="metric good">892</td><td class="metric good">665</td><td class="metric good">1392</td><td class="metric good">0.002</td><td class="metric bad">221</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">3</td><td class="metric neutral">2026-07-14 17:29:19</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">225</td><td class="metric good">388</td><td class="metric good">388</td><td class="metric good">369</td><td class="metric good">370</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">4</td><td class="metric neutral">2026-07-14 17:29:11</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1311</td><td class="metric good">1532</td><td class="metric good">1532</td><td class="metric good">1524</td><td class="metric good">1524</td><td class="metric good">0.000</td><td class="metric bad">108</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">5</td><td class="metric neutral">2026-07-14 17:28:52</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1423</td><td class="metric warn">2820</td><td class="metric warn">3940</td><td class="metric warn">2807</td><td class="metric warn">3940</td><td class="metric good">0.001</td><td class="metric warn">96</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">6</td><td class="metric neutral">2026-07-14 17:28:16</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric good">692</td><td class="metric good">952</td><td class="metric good">952</td><td class="metric good">890</td><td class="metric warn">3617</td><td class="metric good">0.002</td><td class="metric warn">99</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">7</td><td class="metric neutral">2026-07-14 17:27:59</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric good">711</td><td class="metric good">1788</td><td class="metric warn">2528</td><td class="metric good">1769</td><td class="metric warn">4572</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">8</td><td class="metric neutral">2026-07-14 17:23:41</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">702</td><td class="metric good">948</td><td class="metric good">948</td><td class="metric good">876</td><td class="metric good">877</td><td class="metric good">0.001</td><td class="metric bad">110</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">9</td><td class="metric neutral">2026-07-14 17:23:26</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">328</td><td class="metric good">744</td><td class="metric good">944</td><td class="metric good">730</td><td class="metric good">1524</td><td class="metric good">0.002</td><td class="metric bad">216</td><td class="metric good">26 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">10</td><td class="metric neutral">2026-07-14 17:23:18</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">159</td><td class="metric good">272</td><td class="metric good">272</td><td class="metric good">330</td><td class="metric good">504</td><td class="metric good">0.004</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">11</td><td class="metric neutral">2026-07-14 17:23:10</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1093</td><td class="metric good">1312</td><td class="metric good">1312</td><td class="metric good">1296</td><td class="metric good">1296</td><td class="metric good">0.000</td><td class="metric bad">103</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">12</td><td class="metric neutral">2026-07-14 17:22:52</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">1103</td><td class="metric warn">2980</td><td class="metric bad">4164</td><td class="metric warn">2961</td><td class="metric warn">4164</td><td class="metric good">0.001</td><td class="metric warn">96</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">13</td><td class="metric neutral">2026-07-14 17:22:35</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric good">709</td><td class="metric good">948</td><td class="metric good">948</td><td class="metric good">868</td><td class="metric good">948</td><td class="metric good">0.000</td><td class="metric warn">95</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">14</td><td class="metric neutral">2026-07-14 17:22:17</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric warn">827</td><td class="metric warn">2008</td><td class="metric warn">2852</td><td class="metric good">1990</td><td class="metric warn">4358</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">15</td><td class="metric neutral">2026-07-14 16:03:01</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">587</td><td class="metric good">796</td><td class="metric good">796</td><td class="metric good">730</td><td class="metric good">730</td><td class="metric good">0.001</td><td class="metric warn">100</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">16</td><td class="metric neutral">2026-07-14 16:02:47</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari-5041.pro/ru</td><td class="metric good">401</td><td class="metric warn">2924</td><td class="metric warn">2924</td><td class="metric warn">2896</td><td class="metric warn">3706</td><td class="metric good">0.001</td><td class="metric bad">107</td><td class="metric good">26 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">17</td><td class="metric neutral">2026-07-14 16:02:38</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">https://fastpari-5041.pro/en</td><td class="metric good">154</td><td class="metric good">572</td><td class="metric good">572</td><td class="metric good">313</td><td class="metric good">640</td><td class="metric good">0.002</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">2</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">18</td><td class="metric neutral">2026-07-14 16:02:32</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">940</td><td class="metric good">1212</td><td class="metric good">1212</td><td class="metric good">1150</td><td class="metric good">1151</td><td class="metric good">0.000</td><td class="metric bad">101</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">19</td><td class="metric neutral">2026-07-14 16:02:16</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">https://fastpari.com/bn</td><td class="metric warn">948</td><td class="metric warn">2288</td><td class="metric warn">3140</td><td class="metric warn">2270</td><td class="metric warn">3140</td><td class="metric good">0.001</td><td class="metric warn">96</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="data-row"><td class="metric neutral">20</td><td class="metric neutral">2026-07-14 16:02:02</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">https://fastpari-92371.bar/uz</td><td class="metric good">703</td><td class="metric good">924</td><td class="metric good">924</td><td class="metric good">858</td><td class="metric good">924</td><td class="metric good">0.002</td><td class="metric warn">97</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr></tbody>
+            <tfoot><tr class="summary-divider"><td colspan="16">По гео и источнику</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric warn">1158</td><td class="metric warn">2696</td><td class="metric warn">3748</td><td class="metric warn">2679</td><td class="metric warn">3748</td><td class="metric good">0.001</td><td class="metric warn">96</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric warn">1103</td><td class="metric warn">2820</td><td class="metric warn">3940</td><td class="metric warn">2807</td><td class="metric warn">3940</td><td class="metric good">0.001</td><td class="metric warn">96</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric warn">1115</td><td class="metric good">1352</td><td class="metric good">1352</td><td class="metric good">1323</td><td class="metric good">1324</td><td class="metric good">0.000</td><td class="metric bad">104</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric warn">1093</td><td class="metric good">1312</td><td class="metric good">1312</td><td class="metric good">1296</td><td class="metric good">1296</td><td class="metric good">0.000</td><td class="metric bad">103</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">—</td><td class="metric good">179</td><td class="metric good">411</td><td class="metric good">411</td><td class="metric good">337</td><td class="metric good">505</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">—</td><td class="metric good">159</td><td class="metric good">388</td><td class="metric good">388</td><td class="metric good">330</td><td class="metric good">504</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric good">340</td><td class="metric good">1449</td><td class="metric good">1587</td><td class="metric good">1430</td><td class="metric good">2207</td><td class="metric good">0.002</td><td class="metric bad">181</td><td class="metric good">17 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric good">328</td><td class="metric good">744</td><td class="metric good">944</td><td class="metric good">730</td><td class="metric good">1524</td><td class="metric good">0.002</td><td class="metric bad">216</td><td class="metric good">26 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric good">662</td><td class="metric good">888</td><td class="metric good">888</td><td class="metric good">820</td><td class="metric good">821</td><td class="metric good">0.001</td><td class="metric bad">107</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric good">696</td><td class="metric good">920</td><td class="metric good">920</td><td class="metric good">855</td><td class="metric good">856</td><td class="metric good">0.001</td><td class="metric bad">110</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric good">769</td><td class="metric warn">1898</td><td class="metric warn">2690</td><td class="metric good">1880</td><td class="metric warn">4465</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric good">769</td><td class="metric warn">1898</td><td class="metric warn">2690</td><td class="metric good">1880</td><td class="metric warn">4465</td><td class="metric good">0.003</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric good">701</td><td class="metric good">941</td><td class="metric good">941</td><td class="metric good">872</td><td class="metric good">1830</td><td class="metric good">0.001</td><td class="metric warn">97</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric good">703</td><td class="metric good">948</td><td class="metric good">948</td><td class="metric good">868</td><td class="metric good">948</td><td class="metric good">0.002</td><td class="metric warn">97</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-divider"><td colspan="16">По гео (все источники)</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric warn">1136</td><td class="metric warn">2024</td><td class="metric warn">2550</td><td class="metric warn">2001</td><td class="metric good">2536</td><td class="metric good">0.001</td><td class="metric warn">100</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Bangladesh</td><td class="metric neutral">HOME</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric warn">1098</td><td class="metric warn">1910</td><td class="metric good">2336</td><td class="metric good">1897</td><td class="metric good">2332</td><td class="metric good">0.001</td><td class="metric warn">98</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric good">394</td><td class="metric good">916</td><td class="metric good">962</td><td class="metric good">863</td><td class="metric good">1178</td><td class="metric good">0.002</td><td class="metric bad">179</td><td class="metric good">6 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Russia</td><td class="metric neutral">HOME</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric good">328</td><td class="metric good">744</td><td class="metric good">892</td><td class="metric good">730</td><td class="metric good">856</td><td class="metric good">0.002</td><td class="metric bad">216</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric good">728</td><td class="metric good">1324</td><td class="metric good">1641</td><td class="metric good">1275</td><td class="metric good">2884</td><td class="metric good">0.002</td><td class="metric warn">98</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Uzbekistan</td><td class="metric neutral">HOME</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric good">709</td><td class="metric good">952</td><td class="metric good">952</td><td class="metric good">890</td><td class="metric warn">3617</td><td class="metric good">0.002</td><td class="metric warn">99</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-divider"><td colspan="16">По источнику (все гео)</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">—</td><td class="metric good">179</td><td class="metric good">411</td><td class="metric good">411</td><td class="metric good">337</td><td class="metric good">505</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric warn">1</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Локальный IP</td><td class="metric neutral">—</td><td class="metric good">159</td><td class="metric good">388</td><td class="metric good">388</td><td class="metric good">330</td><td class="metric good">504</td><td class="metric good">0.003</td><td class="metric bad">250</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric good">754</td><td class="metric warn">2029</td><td class="metric warn">2673</td><td class="metric warn">2011</td><td class="metric warn">3350</td><td class="metric good">0.002</td><td class="metric bad">129</td><td class="metric good">7 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Локальный + прокси</td><td class="metric neutral">—</td><td class="metric good">769</td><td class="metric warn">2148</td><td class="metric warn">2888</td><td class="metric warn">2130</td><td class="metric warn">3823</td><td class="metric good">0.002</td><td class="metric warn">99</td><td class="metric good">1 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric warn">826</td><td class="metric good">1060</td><td class="metric good">1060</td><td class="metric good">1005</td><td class="metric good">1325</td><td class="metric good">0.001</td><td class="metric bad">103</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Dolphin + прокси</td><td class="metric neutral">—</td><td class="metric good">703</td><td class="metric good">948</td><td class="metric good">948</td><td class="metric good">876</td><td class="metric good">948</td><td class="metric good">0.001</td><td class="metric bad">101</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-divider"><td colspan="16">Итого</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Среднее</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric good">700</td><td class="metric good">1350</td><td class="metric good">1608</td><td class="metric good">1307</td><td class="metric good">2012</td><td class="metric good">0.002</td><td class="metric bad">135</td><td class="metric good">3 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr><tr class="summary-row"><td class="metric neutral">—</td><td class="metric neutral">Медиана</td><td class="metric neutral">Все гео</td><td class="metric neutral">Все страницы</td><td class="metric neutral">Все источники</td><td class="metric neutral">—</td><td class="metric good">702</td><td class="metric good">950</td><td class="metric good">950</td><td class="metric good">883</td><td class="metric good">1344</td><td class="metric good">0.001</td><td class="metric bad">102</td><td class="metric good">0 КБ</td><td class="metric good">0</td><td class="metric neutral">—</td></tr></tfoot>
         </table>
     </div>
-    <div class="pagination" id="table-pagination" data-rows-per-page="20" data-total-rows="120">
+    <div class="pagination" id="table-pagination" data-rows-per-page="20" data-total-rows="20">
         <button type="button" class="page-btn" id="page-prev" disabled>← Назад</button>
         <span class="page-info" id="page-info"></span>
         <button type="button" class="page-btn" id="page-next">Вперёд →</button>
     </div>
     
+        
+    <section class="charts-section">
+        <h2 class="section-title">Динамика по гео</h2>
+        <p class="subtitle charts-intro">
+            Линии — тренд по времени. Ниже — медиана local+прокси vs Dolphin за 7 дней и разница (Δ) по парам
+            прогонов. Положительная Δ — local медленнее. Метрика по умолчанию: LCP (мс).
+        </p>
+        <div class="charts-grid">
+        <article class="chart-card" data-geo="Russia">
+            <div class="chart-header">
+                <h3 class="chart-title">Russia</h3>
+                <div class="chart-controls">
+                    <div class="period-btns" role="group" aria-label="Период">
+                        <button type="button" class="period-btn active" data-period="24h">24 ч</button>
+                        <button type="button" class="period-btn" data-period="7d">7 дн</button>
+                        <button type="button" class="period-btn" data-period="30d">30 дн</button>
+                    </div>
+                    <label class="metric-picker">
+                        <span>Метрика</span>
+                        <select class="metric-select"><option value="lcp">LCP</option><option value="ttfb">TTFB</option><option value="fcp">FCP</option><option value="load">Load</option><option value="cls">CLS</option></select>
+                    </label>
+                </div>
+            </div>
+            <div class="chart-canvas-wrap">
+                <canvas id="chart-russia" class="chart-timeline" aria-label="Динамика Russia"></canvas>
+                <p class="chart-empty chart-empty-timeline hidden">Нет данных за выбранный период</p>
+            </div>
+            <p class="chart-meta"></p>
+            <div class="chart-subsection">
+                <h4 class="chart-subtitle">Сравнение local vs Dolphin · медиана и Δ за 7 дней</h4>
+                <div class="chart-duo">
+                    <div class="chart-duo-item">
+                        <p class="chart-duo-label">Медиана (7 дн)</p>
+                        <div class="chart-canvas-wrap chart-canvas-wrap--short">
+                            <canvas id="chart-bar-russia" class="chart-bar" aria-label="Медиана Russia"></canvas>
+                            <p class="chart-empty chart-empty-bar hidden">Нет данных</p>
+                        </div>
+                    </div>
+                    <div class="chart-duo-item">
+                        <p class="chart-duo-label">Δ local − Dolphin (7 дн)</p>
+                        <div class="chart-canvas-wrap chart-canvas-wrap--short">
+                            <canvas id="chart-delta-russia" class="chart-delta" aria-label="Delta Russia"></canvas>
+                            <p class="chart-empty chart-empty-delta hidden">Нет пар замеров</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="chart-compare-meta"></p>
+            </div>
+        </article>
+        
+        <article class="chart-card" data-geo="Uzbekistan">
+            <div class="chart-header">
+                <h3 class="chart-title">Uzbekistan</h3>
+                <div class="chart-controls">
+                    <div class="period-btns" role="group" aria-label="Период">
+                        <button type="button" class="period-btn active" data-period="24h">24 ч</button>
+                        <button type="button" class="period-btn" data-period="7d">7 дн</button>
+                        <button type="button" class="period-btn" data-period="30d">30 дн</button>
+                    </div>
+                    <label class="metric-picker">
+                        <span>Метрика</span>
+                        <select class="metric-select"><option value="lcp">LCP</option><option value="ttfb">TTFB</option><option value="fcp">FCP</option><option value="load">Load</option><option value="cls">CLS</option></select>
+                    </label>
+                </div>
+            </div>
+            <div class="chart-canvas-wrap">
+                <canvas id="chart-uzbekistan" class="chart-timeline" aria-label="Динамика Uzbekistan"></canvas>
+                <p class="chart-empty chart-empty-timeline hidden">Нет данных за выбранный период</p>
+            </div>
+            <p class="chart-meta"></p>
+            <div class="chart-subsection">
+                <h4 class="chart-subtitle">Сравнение local vs Dolphin · медиана и Δ за 7 дней</h4>
+                <div class="chart-duo">
+                    <div class="chart-duo-item">
+                        <p class="chart-duo-label">Медиана (7 дн)</p>
+                        <div class="chart-canvas-wrap chart-canvas-wrap--short">
+                            <canvas id="chart-bar-uzbekistan" class="chart-bar" aria-label="Медиана Uzbekistan"></canvas>
+                            <p class="chart-empty chart-empty-bar hidden">Нет данных</p>
+                        </div>
+                    </div>
+                    <div class="chart-duo-item">
+                        <p class="chart-duo-label">Δ local − Dolphin (7 дн)</p>
+                        <div class="chart-canvas-wrap chart-canvas-wrap--short">
+                            <canvas id="chart-delta-uzbekistan" class="chart-delta" aria-label="Delta Uzbekistan"></canvas>
+                            <p class="chart-empty chart-empty-delta hidden">Нет пар замеров</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="chart-compare-meta"></p>
+            </div>
+        </article>
+        
+        <article class="chart-card" data-geo="Bangladesh">
+            <div class="chart-header">
+                <h3 class="chart-title">Bangladesh</h3>
+                <div class="chart-controls">
+                    <div class="period-btns" role="group" aria-label="Период">
+                        <button type="button" class="period-btn active" data-period="24h">24 ч</button>
+                        <button type="button" class="period-btn" data-period="7d">7 дн</button>
+                        <button type="button" class="period-btn" data-period="30d">30 дн</button>
+                    </div>
+                    <label class="metric-picker">
+                        <span>Метрика</span>
+                        <select class="metric-select"><option value="lcp">LCP</option><option value="ttfb">TTFB</option><option value="fcp">FCP</option><option value="load">Load</option><option value="cls">CLS</option></select>
+                    </label>
+                </div>
+            </div>
+            <div class="chart-canvas-wrap">
+                <canvas id="chart-bangladesh" class="chart-timeline" aria-label="Динамика Bangladesh"></canvas>
+                <p class="chart-empty chart-empty-timeline hidden">Нет данных за выбранный период</p>
+            </div>
+            <p class="chart-meta"></p>
+            <div class="chart-subsection">
+                <h4 class="chart-subtitle">Сравнение local vs Dolphin · медиана и Δ за 7 дней</h4>
+                <div class="chart-duo">
+                    <div class="chart-duo-item">
+                        <p class="chart-duo-label">Медиана (7 дн)</p>
+                        <div class="chart-canvas-wrap chart-canvas-wrap--short">
+                            <canvas id="chart-bar-bangladesh" class="chart-bar" aria-label="Медиана Bangladesh"></canvas>
+                            <p class="chart-empty chart-empty-bar hidden">Нет данных</p>
+                        </div>
+                    </div>
+                    <div class="chart-duo-item">
+                        <p class="chart-duo-label">Δ local − Dolphin (7 дн)</p>
+                        <div class="chart-canvas-wrap chart-canvas-wrap--short">
+                            <canvas id="chart-delta-bangladesh" class="chart-delta" aria-label="Delta Bangladesh"></canvas>
+                            <p class="chart-empty chart-empty-delta hidden">Нет пар замеров</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="chart-compare-meta"></p>
+            </div>
+        </article>
+        </div>
+    </section>
+    
     </div>
     <div id="global-tooltip" class="global-tooltip"></div>
     <script>
+        const CHART_POINTS = [{"ts": 1784044922000, "geo": "Uzbekistan", "source": "dolphin_proxy", "ok": true, "lcp": 924, "ttfb": 703, "fcp": 924, "load": 924, "cls": 0.002}, {"ts": 1784044936000, "geo": "Bangladesh", "source": "local_proxy", "ok": true, "lcp": 3140, "ttfb": 948, "fcp": 2288, "load": 3140, "cls": 0.001}, {"ts": 1784044952000, "geo": "Bangladesh", "source": "dolphin_proxy", "ok": true, "lcp": 1212, "ttfb": 940, "fcp": 1212, "load": 1151, "cls": 0.0}, {"ts": 1784044958000, "geo": "Russia", "source": "local_ip", "ok": true, "lcp": 572, "ttfb": 154, "fcp": 572, "load": 640, "cls": 0.002}, {"ts": 1784044967000, "geo": "Russia", "source": "local_proxy", "ok": true, "lcp": 2924, "ttfb": 401, "fcp": 2924, "load": 3706, "cls": 0.001}, {"ts": 1784044981000, "geo": "Russia", "source": "dolphin_proxy", "ok": true, "lcp": 796, "ttfb": 587, "fcp": 796, "load": 730, "cls": 0.001}, {"ts": 1784049737000, "geo": "Uzbekistan", "source": "local_proxy", "ok": true, "lcp": 2852, "ttfb": 827, "fcp": 2008, "load": 4358, "cls": 0.003}, {"ts": 1784049755000, "geo": "Uzbekistan", "source": "dolphin_proxy", "ok": true, "lcp": 948, "ttfb": 709, "fcp": 948, "load": 948, "cls": 0.0}, {"ts": 1784049772000, "geo": "Bangladesh", "source": "local_proxy", "ok": true, "lcp": 4164, "ttfb": 1103, "fcp": 2980, "load": 4164, "cls": 0.001}, {"ts": 1784049790000, "geo": "Bangladesh", "source": "dolphin_proxy", "ok": true, "lcp": 1312, "ttfb": 1093, "fcp": 1312, "load": 1296, "cls": 0.0}, {"ts": 1784049798000, "geo": "Russia", "source": "local_ip", "ok": true, "lcp": 272, "ttfb": 159, "fcp": 272, "load": 504, "cls": 0.004}, {"ts": 1784049806000, "geo": "Russia", "source": "local_proxy", "ok": true, "lcp": 944, "ttfb": 328, "fcp": 744, "load": 1524, "cls": 0.002}, {"ts": 1784049821000, "geo": "Russia", "source": "dolphin_proxy", "ok": true, "lcp": 948, "ttfb": 702, "fcp": 948, "load": 877, "cls": 0.001}, {"ts": 1784050079000, "geo": "Uzbekistan", "source": "local_proxy", "ok": true, "lcp": 2528, "ttfb": 711, "fcp": 1788, "load": 4572, "cls": 0.003}, {"ts": 1784050096000, "geo": "Uzbekistan", "source": "dolphin_proxy", "ok": true, "lcp": 952, "ttfb": 692, "fcp": 952, "load": 3617, "cls": 0.002}, {"ts": 1784050132000, "geo": "Bangladesh", "source": "local_proxy", "ok": true, "lcp": 3940, "ttfb": 1423, "fcp": 2820, "load": 3940, "cls": 0.001}, {"ts": 1784050151000, "geo": "Bangladesh", "source": "dolphin_proxy", "ok": true, "lcp": 1532, "ttfb": 1311, "fcp": 1532, "load": 1524, "cls": 0.0}, {"ts": 1784050159000, "geo": "Russia", "source": "local_ip", "ok": true, "lcp": 388, "ttfb": 225, "fcp": 388, "load": 370, "cls": 0.003}, {"ts": 1784050212000, "geo": "Russia", "source": "local_proxy", "ok": true, "lcp": 892, "ttfb": 291, "fcp": 680, "load": 1392, "cls": 0.002}, {"ts": 1784050230000, "geo": "Russia", "source": "dolphin_proxy", "ok": true, "lcp": 920, "ttfb": 696, "fcp": 920, "load": 856, "cls": 0.001}];
+        const CHART_SOURCE_STYLES = {"local_ip": {"label": "Локальный IP", "color": "#94a3b8"}, "local_proxy": {"label": "Локальный + прокси", "color": "#2563eb"}, "dolphin_proxy": {"label": "Dolphin + прокси", "color": "#16a34a"}};
+        const CHART_SOURCE_ORDER = ["local_ip", "local_proxy", "dolphin_proxy"];
+        const COMPARE_SOURCES = ["local_proxy", "dolphin_proxy"];
+        const COMPARE_PERIOD_MS = 604800000;
+        const DELTA_PAIR_MAX_GAP_MS = 1800000;
+
         const tooltip = document.getElementById('global-tooltip');
 
         function positionTooltip(target) {
@@ -420,6 +714,445 @@
             }
 
             renderPage();
+        })();
+
+        (function initGeoCharts() {
+            if (!window.Chart || !Array.isArray(CHART_POINTS) || CHART_POINTS.length === 0) {
+                return;
+            }
+
+            const PERIOD_MS = {
+                "24h": 24 * 60 * 60 * 1000,
+                "7d": 7 * 24 * 60 * 60 * 1000,
+                "30d": 30 * 24 * 60 * 60 * 1000,
+            };
+
+            const METRIC_UNITS = {
+                lcp: "мс",
+                ttfb: "мс",
+                fcp: "мс",
+                load: "мс",
+                cls: "",
+            };
+
+            const charts = new Map();
+
+            function median(values) {
+                if (!values.length) return null;
+                const sorted = values.slice().sort((a, b) => a - b);
+                const mid = Math.floor(sorted.length / 2);
+                if (sorted.length % 2) return sorted[mid];
+                return (sorted[mid - 1] + sorted[mid]) / 2;
+            }
+
+            function formatMetricValue(metric, value) {
+                if (value === null || value === undefined || Number.isNaN(value)) {
+                    return "нет данных";
+                }
+                if (metric === "cls") {
+                    return value.toFixed(3);
+                }
+                const unit = METRIC_UNITS[metric] || "";
+                return String(Math.round(value)) + (unit ? " " + unit : "");
+            }
+
+            function formatTs(ts) {
+                return new Date(ts).toLocaleString("ru-RU", {
+                    month: "short",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                });
+            }
+
+            function filterPoints(geo, periodMs, metric) {
+                const cutoff = Date.now() - periodMs;
+                return CHART_POINTS.filter(
+                    (point) => point.geo === geo && point.ts >= cutoff
+                ).map((point) => ({
+                    ts: point.ts,
+                    source: point.source,
+                    value: point[metric],
+                    ok: point.ok,
+                }));
+            }
+
+            function buildDatasets(points, metric) {
+                const grouped = new Map();
+                points.forEach((point) => {
+                    if (!grouped.has(point.source)) {
+                        grouped.set(point.source, []);
+                    }
+                    grouped.get(point.source).push(point);
+                });
+
+                return CHART_SOURCE_ORDER
+                    .filter((source) => grouped.has(source))
+                    .map((source) => {
+                        const style = CHART_SOURCE_STYLES[source] || {
+                            label: source,
+                            color: "#64748b",
+                        };
+                        const rows = grouped.get(source).sort((a, b) => a.ts - b.ts);
+                        return {
+                            label: style.label,
+                            data: rows.map((row) => ({
+                                x: row.ts,
+                                y: row.value,
+                            })),
+                            borderColor: style.color,
+                            backgroundColor: style.color,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            borderWidth: 2,
+                            tension: 0.2,
+                            spanGaps: false,
+                        };
+                    });
+            }
+
+            function destroyChart(canvas) {
+                if (canvas && charts.has(canvas)) {
+                    charts.get(canvas).destroy();
+                    charts.delete(canvas);
+                }
+            }
+
+            function upsertChart(canvas, config) {
+                if (charts.has(canvas)) {
+                    const chart = charts.get(canvas);
+                    chart.config.type = config.type;
+                    chart.data = config.data;
+                    chart.options = config.options;
+                    chart.update();
+                    return chart;
+                }
+                const chart = new Chart(canvas, config);
+                charts.set(canvas, chart);
+                return chart;
+            }
+
+            function filterGeoPoints(geo, periodMs) {
+                const cutoff = Date.now() - periodMs;
+                return CHART_POINTS.filter(
+                    (point) => point.geo === geo && point.ts >= cutoff
+                );
+            }
+
+            function collectMetricValues(points, source, metric) {
+                return points
+                    .filter(
+                        (point) =>
+                            point.source === source &&
+                            point.ok &&
+                            point[metric] !== null &&
+                            point[metric] !== undefined
+                    )
+                    .map((point) => point[metric]);
+            }
+
+            function buildDeltaPoints(geo, periodMs, metric) {
+                const points = filterGeoPoints(geo, periodMs);
+                const localRows = points.filter(
+                    (point) =>
+                        point.source === "local_proxy" &&
+                        point.ok &&
+                        point[metric] !== null &&
+                        point[metric] !== undefined
+                );
+                const dolphinRows = points.filter(
+                    (point) =>
+                        point.source === "dolphin_proxy" &&
+                        point.ok &&
+                        point[metric] !== null &&
+                        point[metric] !== undefined
+                );
+
+                const deltas = [];
+                dolphinRows.forEach((dolphin) => {
+                    let best = null;
+                    let bestGap = Infinity;
+                    localRows.forEach((local) => {
+                        const gap = Math.abs(local.ts - dolphin.ts);
+                        if (gap < bestGap && gap <= DELTA_PAIR_MAX_GAP_MS) {
+                            bestGap = gap;
+                            best = local;
+                        }
+                    });
+                    if (best) {
+                        deltas.push({
+                            ts: dolphin.ts,
+                            delta: best[metric] - dolphin[metric],
+                        });
+                    }
+                });
+                return deltas.sort((a, b) => a.ts - b.ts);
+            }
+
+            function renderTimelineChart(card) {
+                const geo = card.dataset.geo;
+                const period = card.querySelector(".period-btn.active")?.dataset.period || "24h";
+                const metric = card.querySelector(".metric-select")?.value || "lcp";
+                const canvas = card.querySelector("canvas.chart-timeline");
+                const emptyEl = card.querySelector(".chart-empty-timeline");
+                const metaEl = card.querySelector(".chart-meta");
+                if (!canvas || !geo) return;
+
+                const periodMs = PERIOD_MS[period] || PERIOD_MS["24h"];
+                const points = filterPoints(geo, periodMs, metric);
+                const datasets = buildDatasets(points, metric);
+                const visibleCount = datasets.reduce((sum, ds) => sum + ds.data.length, 0);
+
+                if (visibleCount === 0) {
+                    emptyEl?.classList.remove("hidden");
+                    canvas.style.display = "none";
+                    if (metaEl) metaEl.textContent = "Нет замеров HOME за выбранный период.";
+                    destroyChart(canvas);
+                    return;
+                }
+
+                emptyEl?.classList.add("hidden");
+                canvas.style.display = "block";
+
+                const unit = METRIC_UNITS[metric] || "";
+                const yTitle = unit
+                    ? metric.toUpperCase() + " (" + unit + ")"
+                    : metric.toUpperCase();
+                const successCount = points.filter(
+                    (point) => point.ok && point.value !== null && point.value !== undefined
+                ).length;
+
+                if (metaEl) {
+                    metaEl.textContent =
+                        "Точек: " + points.length + " · с метрикой: " + successCount + " · период: " + period;
+                }
+
+                upsertChart(canvas, {
+                    type: "line",
+                    data: { datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: "nearest", intersect: false },
+                        plugins: {
+                            legend: {
+                                position: "bottom",
+                                labels: { boxWidth: 12, boxHeight: 12 },
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: (items) => {
+                                        const ts = items[0]?.parsed?.x;
+                                        return ts ? formatTs(ts) : "";
+                                    },
+                                    label: (item) => {
+                                        const value = item.parsed.y;
+                                        return item.dataset.label + ": " + formatMetricValue(metric, value);
+                                    },
+                                },
+                            },
+                        },
+                        scales: {
+                            x: {
+                                type: "linear",
+                                ticks: {
+                                    maxRotation: 0,
+                                    autoSkip: true,
+                                    maxTicksLimit: 8,
+                                    callback: (value) => formatTs(value),
+                                },
+                                title: { display: true, text: "Время" },
+                            },
+                            y: {
+                                beginAtZero: metric === "cls",
+                                title: { display: true, text: yTitle },
+                            },
+                        },
+                    },
+                });
+            }
+
+            function renderMedianBarChart(card) {
+                const geo = card.dataset.geo;
+                const metric = card.querySelector(".metric-select")?.value || "lcp";
+                const canvas = card.querySelector("canvas.chart-bar");
+                const emptyEl = card.querySelector(".chart-empty-bar");
+                if (!canvas || !geo) return;
+
+                const points = filterGeoPoints(geo, COMPARE_PERIOD_MS);
+                const labels = [];
+                const values = [];
+                const colors = [];
+
+                COMPARE_SOURCES.forEach((source) => {
+                    const style = CHART_SOURCE_STYLES[source] || {
+                        label: source,
+                        color: "#64748b",
+                    };
+                    const med = median(collectMetricValues(points, source, metric));
+                    if (med !== null) {
+                        labels.push(style.label);
+                        values.push(med);
+                        colors.push(style.color);
+                    }
+                });
+
+                if (!values.length) {
+                    emptyEl?.classList.remove("hidden");
+                    canvas.style.display = "none";
+                    destroyChart(canvas);
+                    return;
+                }
+
+                emptyEl?.classList.add("hidden");
+                canvas.style.display = "block";
+
+                const unit = METRIC_UNITS[metric] || "";
+                const yTitle = unit
+                    ? "Медиана " + metric.toUpperCase() + " (" + unit + ")"
+                    : "Медиана " + metric.toUpperCase();
+
+                upsertChart(canvas, {
+                    type: "bar",
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: "Медиана (7 дн)",
+                            data: values,
+                            backgroundColor: colors,
+                            borderColor: colors,
+                            borderWidth: 1,
+                            borderRadius: 6,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (item) => "Медиана: " + formatMetricValue(metric, item.parsed.y),
+                                },
+                            },
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: metric === "cls",
+                                title: { display: true, text: yTitle },
+                            },
+                        },
+                    },
+                });
+            }
+
+            function renderDeltaChart(card) {
+                const geo = card.dataset.geo;
+                const metric = card.querySelector(".metric-select")?.value || "lcp";
+                const canvas = card.querySelector("canvas.chart-delta");
+                const emptyEl = card.querySelector(".chart-empty-delta");
+                const compareMeta = card.querySelector(".chart-compare-meta");
+                if (!canvas || !geo) return;
+
+                const deltas = buildDeltaPoints(geo, COMPARE_PERIOD_MS, metric);
+
+                if (!deltas.length) {
+                    emptyEl?.classList.remove("hidden");
+                    canvas.style.display = "none";
+                    if (compareMeta) {
+                        compareMeta.textContent =
+                            "Δ: нет пар local+Dolphin в пределах 30 мин за 7 дней.";
+                    }
+                    destroyChart(canvas);
+                    return;
+                }
+
+                emptyEl?.classList.add("hidden");
+                canvas.style.display = "block";
+
+                const unit = METRIC_UNITS[metric] || "";
+                const yTitle = unit
+                    ? "Δ " + metric.toUpperCase() + " (" + unit + ")"
+                    : "Δ " + metric.toUpperCase();
+                const avgDelta = deltas.reduce((sum, row) => sum + row.delta, 0) / deltas.length;
+
+                if (compareMeta) {
+                    compareMeta.textContent =
+                        "Пар замеров: " + deltas.length +
+                        " · средняя Δ: " + formatMetricValue(metric, avgDelta) +
+                        " (положительная — local медленнее)";
+                }
+
+                upsertChart(canvas, {
+                    type: "line",
+                    data: {
+                        datasets: [{
+                            label: "Δ local − Dolphin",
+                            data: deltas.map((row) => ({ x: row.ts, y: row.delta })),
+                            borderColor: "#ea580c",
+                            backgroundColor: "#ea580c",
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            borderWidth: 2,
+                            tension: 0.2,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: "bottom" },
+                            tooltip: {
+                                callbacks: {
+                                    title: (items) => {
+                                        const ts = items[0]?.parsed?.x;
+                                        return ts ? formatTs(ts) : "";
+                                    },
+                                    label: (item) => "Δ: " + formatMetricValue(metric, item.parsed.y),
+                                },
+                            },
+                        },
+                        scales: {
+                            x: {
+                                type: "linear",
+                                ticks: {
+                                    maxRotation: 0,
+                                    autoSkip: true,
+                                    maxTicksLimit: 6,
+                                    callback: (value) => formatTs(value),
+                                },
+                                title: { display: true, text: "Время (Dolphin)" },
+                            },
+                            y: {
+                                title: { display: true, text: yTitle },
+                            },
+                        },
+                    },
+                });
+            }
+
+            function renderCardCharts(card) {
+                renderTimelineChart(card);
+                renderMedianBarChart(card);
+                renderDeltaChart(card);
+            }
+
+            document.querySelectorAll(".chart-card").forEach((card) => {
+                renderCardCharts(card);
+
+                card.querySelectorAll(".period-btn").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        card.querySelectorAll(".period-btn").forEach((item) => {
+                            item.classList.toggle("active", item === btn);
+                        });
+                        renderTimelineChart(card);
+                    });
+                });
+
+                card.querySelector(".metric-select")?.addEventListener("change", () => {
+                    renderCardCharts(card);
+                });
+            });
         })();
     </script>
 </body>
