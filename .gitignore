@@ -1,3 +1,10 @@
+.env
+tests/.env
+.gh-pages-worktree/
+
+# Python
+__pycache__/
+*.py[cod]
 
 # Playwright
 node_modules/
@@ -6,3 +13,4 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+data/playwright_profiles/

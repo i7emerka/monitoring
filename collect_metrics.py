@@ -1,47 +1,75 @@
-from config.profiles import PROFILES
-from config.pages import PAGES
+import argparse
+import sys
 
-from core.adspower import start_profile
-from core.browser import connect_to_browser, get_or_create_context, create_page, close_all_pages
-from core.monitor import monitor_page
-from core.warmup import warmup
+from config.profiles import PROFILES, get_profile_proxy
+
+from core.compare_runner import run_dolphin_profile, run_full_compare, run_local_proxy_test
 from core.html_report import generate_html_report
+from core.publish_report import publish_report
 
-def run_for_profile(profile_key: str):
+COMPARE_PROFILES = {"UZ", "BD", "RU"}
+
+
+def run_for_profile(profile_key: str, *, use_dolphin: bool = False):
     profile = PROFILES[profile_key]
-    print(f"\n🚀 Запуск профиля {profile_key} ({profile['geo']})")
-    
-    try:
-        profile_data = start_profile(profile["profile_id"])
-        ws_url = profile_data["ws"]["puppeteer"]
-        
-        pw, browser = connect_to_browser(ws_url)
-        context = get_or_create_context(browser)
-        
-        # Warmup
-        warmup_page = create_page(context)
-        warmup(warmup_page)
-        warmup_page.close()
-        
-        # Тесты
-        for page_name, url in PAGES.items():
-            page = create_page(context)
-            monitor_page(page, profile["geo"], page_name, url)
-            page.close()
-            
-    except Exception as e:
-        print(f"❌ Критическая ошибка в профиле {profile_key}: {e}")
-    finally:
-        try:
-            close_all_pages(context)
-            browser.close()
-            pw.stop()
-        except:
-            pass
+    print(f"\nЗапуск профиля {profile_key} ({profile['geo']})")
+
+    if profile_key in COMPARE_PROFILES:
+        run_full_compare(
+            profile_key,
+            include_dolphin=not use_dolphin,
+            include_local_ip=(profile_key == "RU"),
+        )
+        return
+
+    proxy = get_profile_proxy(profile_key)
+
+    if use_dolphin:
+        print("Режим: Dolphin Anty")
+        run_dolphin_profile(profile_key)
+        return
+
+    if proxy:
+        print("Режим: локальный браузер + прокси")
+        run_local_proxy_test(profile_key)
+        return
+
+    print(
+        f"Прокси для {profile_key} не задан ({profile_key}_PROXY_SERVER в .env), "
+        "используем Dolphin"
+    )
+    run_dolphin_profile(profile_key)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Сбор метрик Fastpari")
+    parser.add_argument(
+        "--profiles",
+        help="Профили через запятую (UZ,BD,RU). По умолчанию — все",
+    )
+    parser.add_argument(
+        "--dolphin",
+        action="store_true",
+        help="Принудительно через Dolphin Anty вместо локального прокси",
+    )
+    args = parser.parse_args(argv)
+
+    if args.profiles:
+        keys = [key.strip().upper() for key in args.profiles.split(",") if key.strip()]
+        unknown = [key for key in keys if key not in PROFILES]
+        if unknown:
+            print(f"Неизвестные профили: {', '.join(unknown)}")
+            return 1
+    else:
+        keys = list(PROFILES.keys())
+
+    for profile_key in keys:
+        run_for_profile(profile_key, use_dolphin=args.dolphin)
+
+    generate_html_report()
+    publish_report()
+    return 0
+
 
 if __name__ == "__main__":
-    # Запуск по одному или всем
-    for profile_key in PROFILES.keys():
-        run_for_profile(profile_key)
-    
-    generate_html_report()
+    sys.exit(main())

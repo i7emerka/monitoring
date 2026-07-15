@@ -1,6 +1,6 @@
-from core.adspower import start_profile
+from core.dolphin import start_profile
 from core.browser import connect_to_browser
-from core.warmup import warmup
+from core.warmup import prime_page
 
 
 def create_session(browser):
